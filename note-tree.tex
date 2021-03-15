@@ -52,6 +52,8 @@
 \newcommand{\QQ}{\mathbb{Q}}
 \newcommand{\RR}{\mathbb{R}}
 
+\DeclareMathOperator*{\argmin}{arg \, min}
+
 \begin{document}
 
 % title
@@ -380,4 +382,16 @@ We have
   C(T) = \sum_{(u, v) \in E} \ell_T(u, v) w(u, v).
 \end{equation*}
 Since the routing loads of all edges can be computed in linear time by depth first search in $T$, the routing cost of $T$ can be computed in linear time.
+
+\section{March 9, 2021}
+\subsection{Median}
+A \emph{median} of a weighted graph $G = (V, E, w)$ is a vertex $r$ such that
+\begin{equation*}
+  r \in \argmin_{u \in V} \sum_{v \in V} w(u, v).
+\end{equation*}
+One can find that a shortest-path tree rooted at median is a 2-approximation of the MRCT of the graph.
+
+\subsection{Centroid}
+If the removal of a vertex $r$ from a tree $T$ causes each component contains at most half of the vertices, then the vertex $r$ is called a \emph{centroid} of $T$.
+
 \end{document}
