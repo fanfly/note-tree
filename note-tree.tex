@@ -385,13 +385,56 @@ Since the routing loads of all edges can be computed in linear time by depth fir
 
 \section{March 9, 2021}
 \subsection{Median}
-A \emph{median} of a weighted graph $G = (V, E, w)$ is a vertex $r$ such that
+A \emph{median} of a weighted graph $G = (V, E, w)$ is a vertex
 \begin{equation*}
-  r \in \argmin_{u \in V} \sum_{v \in V} w(u, v).
+  r \in \argmin_{u \in V} \sum_{v \in V} d_G(u, v).
 \end{equation*}
-One can find that a shortest-path tree rooted at median is a 2-approximation of the MRCT of the graph.
+
+\begin{theorem}
+  Let $G = (V, E, w)$ be a weighted graph, and let $r$ be a median of $G$.
+  Then any shortest-path tree $T$ of $G$ rooted at $r$ is a $2$-approximation of any MRCT $T^*$ of $G$.
+\end{theorem}
+\begin{proof}
+  We have
+  \begin{align*}
+    C(T)
+    &= \sum_{u \in V} \sum_{v \in V} d_T(u, v) \\
+    &\leq \sum_{u \in V} \sum_{v \in V} (d_G(r, u) + d_G(r, v)) \\
+    &= 2 \sum_{u \in V} \sum_{v \in V} d_G(r, v) \\
+    &\leq 2 \sum_{u \in V} \sum_{v \in V} d_G(u, v) \\
+    &\leq 2 \sum_{u \in V} \sum_{v \in V} d_{T^*}(u, v) \\
+    &= 2C(T^*).
+    \qedhere
+  \end{align*}
+\end{proof}
 
 \subsection{Centroid}
-If the removal of a vertex $r$ from a tree $T$ causes each component contains at most half of the vertices, then the vertex $r$ is called a \emph{centroid} of $T$.
+A \emph{centroid} of an $n$-vertex tree $T$ is a vertex $r$ such that
+\begin{equation*}
+  |S| \leq \frac{n}{2}  
+\end{equation*}
+holds for each component $S$ of the forest obtained by removing $r$ from $T$.
+
+\begin{theorem}
+  Let $T^*$ be an MRCT of a weighted graph $G = (V, E, w)$, and let $r$ be a centroid of $T^*$.
+  Then any shortest-path tree $T$ rooted at $r$ is a $2$-approximate MRCT.
+\end{theorem}
+\begin{proof}
+  For any vertex $u \in V \setminus \{r\}$, let $S(u)$ denote the component of the forest $T - r$ that contains $u$.
+  Let $S(r) = \{r\}$.
+  Then we have
+  \begin{align*}
+    C(T)
+    &= \sum_{u \in V} \sum_{v \in V} d_T(u, v) \\
+    &\leq \sum_{u \in V} \sum_{v \in V} (d_G(r, u) + d_G(r, v)) \\
+    &= 2 \sum_{u \in V} \sum_{v \in V} d_G(r, u) \\
+    &\leq 2 \Biggl( \sum_{u \in V} d_G(r, u) \sum_{v \in V} [S(u) \neq S(v)] + \sum_{v \in V} d_G(r, v) \sum_{u \in V} [S(u) \neq S(v)] \Biggr) \\
+    &= 2 \sum_{u \in V} \sum_{v \in V} (d_G(r, u) + d_G(r, v)) [S(u) \neq S(v)] \\
+    &= 2 \sum_{u \in V} \sum_{v \in V} d_{T^*}(u, v) [S(u) \neq S(v)] \\
+    &\leq 2 \sum_{u \in V} \sum_{v \in V} d_{T^*}(u, v) \\
+    &= 2C(T^*).
+    \qedhere
+  \end{align*}
+\end{proof}
 
 \end{document}
