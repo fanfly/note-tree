@@ -42,6 +42,7 @@
 \declaretheorem[style=custom,sibling=definition]{example}
 \declaretheorem[style=custom,sibling=definition]{theorem}
 \declaretheorem[style=custom,sibling=definition]{fact}
+\declaretheorem[style=custom,sibling=definition]{proposition}
 \declaretheorem[style=custom,sibling=definition]{algorithm}
 
 % use bold fonts to emphasize
@@ -384,7 +385,7 @@ We have
 Since the routing loads of all edges can be computed in linear time by depth first search in $T$, the routing cost of $T$ can be computed in linear time.
 
 \section{March 9, 2021}
-\subsection{Median}
+\subsection{Medians}
 A \emph{median} of a weighted graph $G = (V, E, w)$ is a vertex
 \begin{equation*}
   r \in \argmin_{u \in V} \sum_{v \in V} d_G(u, v).
@@ -408,31 +409,137 @@ A \emph{median} of a weighted graph $G = (V, E, w)$ is a vertex
   \end{align*}
 \end{proof}
 
-\subsection{Centroid}
-A \emph{centroid} of an $n$-vertex tree $T$ is a vertex $r$ such that
-\begin{equation*}
-  |S| \leq \frac{n}{2}  
-\end{equation*}
-holds for each component $S$ of the forest obtained by removing $r$ from $T$.
+\subsection{Centroids}
+A \emph{centroid} of an $n$-vertex tree $T$ is a vertex $r$ such that $|B| \leq \lfloor n/2 \rfloor$ holds for each component $B$ of the forest obtained by removing $r$ from $T$.
 
 \begin{theorem}
   Let $T^*$ be an MRCT of a weighted graph $G = (V, E, w)$, and let $r$ be a centroid of $T^*$.
   Then any shortest-path tree $T$ rooted at $r$ is a $2$-approximate MRCT.
 \end{theorem}
 \begin{proof}
-  For any vertex $u \in V \setminus \{r\}$, let $S(u)$ denote the component of the forest $T - r$ that contains $u$.
-  Let $S(r) = \{r\}$.
+  For any vertex $u \in V \setminus \{r\}$, let $B(u)$ denote the component of the forest $T - r$ that contains $u$.
+  Let $B(r) = \{r\}$.
   Then we have
   \begin{align*}
     C(T)
     &= \sum_{u \in V} \sum_{v \in V} d_T(u, v) \\
     &\leq \sum_{u \in V} \sum_{v \in V} (d_G(r, u) + d_G(r, v)) \\
     &= 2 \sum_{u \in V} \sum_{v \in V} d_G(r, u) \\
-    &\leq 2 \Biggl( \sum_{u \in V} d_G(r, u) \sum_{v \in V} [S(u) \neq S(v)] + \sum_{v \in V} d_G(r, v) \sum_{u \in V} [S(u) \neq S(v)] \Biggr) \\
-    &= 2 \sum_{u \in V} \sum_{v \in V} (d_G(r, u) + d_G(r, v)) [S(u) \neq S(v)] \\
-    &= 2 \sum_{u \in V} \sum_{v \in V} d_{T^*}(u, v) [S(u) \neq S(v)] \\
+    &\leq 2 \Biggl( \sum_{u \in V} d_G(r, u) \sum_{v \in V} [B(u) \neq B(v)] + \sum_{v \in V} d_G(r, v) \sum_{u \in V} [B(u) \neq B(v)] \Biggr) \\
+    &= 2 \sum_{u \in V} \sum_{v \in V} (d_G(r, u) + d_G(r, v)) [B(u) \neq B(v)] \\
+    &= 2 \sum_{u \in V} \sum_{v \in V} d_{T^*}(u, v) [B(u) \neq B(v)] \\
     &\leq 2 \sum_{u \in V} \sum_{v \in V} d_{T^*}(u, v) \\
     &= 2C(T^*).
+    \qedhere
+  \end{align*}
+\end{proof}
+
+\section{March 16, 2021}
+\subsection{Separators}
+Let $T = (V, E)$ be an $n$-vertex tree, and let $S$ be a subset of $V$ such that $T[S]$ is connected.
+Each component $B$ of the forest $T - S$ that is obtained by removing $S$ from $T$ is called a \emph{branch} of $S$ in $T$.
+For any $\delta \leq 1/2$, we say that $S$ is a \emph{$\delta$-separator} if each branch of $S$ in $T$ has at most $\lfloor \delta n \rfloor$ vertices, and we say that $S$ is a \emph{minimal $\delta$-separator} if for each $R \subsetneq S$, $R$ is not a $\delta$-separator.
+
+\begin{proposition}
+  For any tree $T$, there is a path $P$ in $T$ such that $P$ is a $1/3$-separator of $T$.
+\end{proposition}
+\begin{proof}
+  Suppose that $T$ has $n$ vertices.
+  Let $r$ be a centroid of $T$, and let $\{B_i: 1 \leq i \leq k\}$ be the branches of $\{r\}$ containing more than $\lfloor n/3 \rfloor$ vertices.
+  We have $0 \leq k \leq 2$ since $3(\lfloor n/3 \rfloor + 1) > n$.
+  For each branch $B_i$ of $\{r\}$ in $T$, let $r_i$ be a centroid of $T[B_i]$, and let $P_i$ be the path in $T$ that connects $r$ and $r_i$.
+  Since $k \leq 2$, the union $P$ of $\{P_i: 1 \leq i \leq k\}$ is a path.
+  (If $k = 0$, let $P$ contain a single vertex $r$.)
+  \par Now we show that $P$ is a $1/3$-separator of $T$.
+  Let $B$ be a branch of $P$ in $T$.
+  If $B$ is a branch of $\{r_i\}$ in $T[B_i]$ for some $i$, then $|B| \leq \lfloor n/4 \rfloor$ since $|B_i| \leq \lfloor n/2 \rfloor$.
+  Otherwise, $B$ is a branch of $\{r\}$ in $T$ such that $B \notin \{B_i: 1 \leq i \leq k\}$, i.e., $|B| \leq \lfloor n/3 \rfloor$.
+  Thus, $P$ is a $1/3$-separator.
+\end{proof}
+
+\begin{theorem}
+  Let $T = (V, E, w)$ be an $n$-vertex weighted tree, and let $S$ be a minimal $\delta$-separator of $T$.
+  Then
+  \begin{equation*}
+    C(T) \geq 2(1-\delta)n \sum_{u \in V} \min_{x \in S} d_T(u, x) + 2\delta(1-\delta)n^2 w(T[S]).
+  \end{equation*}
+\end{theorem}
+\begin{proof}
+  Let $B(u)$ denote the branch of $S$ in $T$ that contains $u$ for each $u \in V \setminus S$, and let $B(u) = S$ for each $u \in S$.
+  Also, define
+  \begin{equation*}
+    \mu(u) \in \argmin_{x \in S} d_T(u, x).
+  \end{equation*}
+  Then we have
+  \begin{align*}
+    C(T)
+    &= \sum_{u \in V} \sum_{v \in V} d_T(u, v) \\
+    &\geq \sum_{u \in V} \sum_{v \in V} d_T(u, v) [B(u) \neq B(v)] \\
+    &= \sum_{u \in V} \sum_{v \in V} \Bigl(d_T(u, \mu(u)) + d_T(v, \mu(v)) + d_T(\mu(u), \mu(v))\Bigr) [B(u) \neq B(v)] \\
+    &= 2 \sum_{u \in V} d_T(u, \mu(u)) \sum_{v \in V} [B(u) \neq B(v)] + \sum_{x \in S} \sum_{y \in S} \ell_T(x, y) w(x, y) \\
+    &\geq 2(1-\delta)n \sum_{u \in V} \min_{x \in S} d_T(u, x) + 2\delta(1-\delta)n^2 w(T[S]).
+    \qedhere
+  \end{align*}
+\end{proof}
+
+\begin{theorem}
+  Let $G = (V, E, w)$ be a weighted graph, and let $S$ be a subset of $V$ such that $G[S]$ is connected.
+  If $T$ is a spanning tree of $G$ such that
+  \begin{equation*}
+    \min_{x \in S} d_T(u, x) = \min_{x \in S} d_G(u, x)
+  \end{equation*}
+  holds for each $u \in V$, then
+  \begin{equation*}
+    C(T) \leq 2n \sum_{u \in V} \min_{x \in S} d_G(u, x) + \frac{n^2}{2} w(T[S]).
+  \end{equation*}
+\end{theorem}
+\begin{proof}
+  Let $B(u)$ denote the branch of $S$ in $T$ that contains $u$ for each $u \in V \setminus S$, and let $B(u) = S$ for each $u \in S$.
+  Also, define
+  \begin{equation*}
+    \mu(u) \in \argmin_{x \in S} d_T(u, x).
+  \end{equation*}
+  Then we have
+  \begin{align*}
+    C(T)
+    &= \sum_{u \in V} \sum_{v \in V} d_T(u, v) \\
+    &\leq \sum_{u \in V} \sum_{v \in V} \Bigl(d_T(u, \mu(u)) + d_T(v, \mu(v)) + d_T(\mu(u), \mu(v))\Bigr) \\
+    &= 2 \sum_{u \in V}\sum_{v \in V} d_T(u, \mu(u)) + \sum_{x \in S} \sum_{y \in S} \ell_T(x, y) w(x, y) \\
+    &\leq 2n \sum_{u \in V} \min_{x \in S} d_T(u, x) + \frac{n^2}{2} w(T[S]).
+    \qedhere
+  \end{align*}
+\end{proof}
+
+\begin{theorem}
+  Let $T^*$ be an MRCT of $G = (V, E, w)$.
+  Let $P$ be a $1/3$-path separator of $T^*$, and let $R$ be a shortest path connecting two endpoints of $P$.
+  If $T$ is a spanning tree of $G$ such that
+  \begin{equation*}
+    \min_{x \in R} d_T(u, x) = \min_{x \in R} d_G(u, x)
+  \end{equation*}
+  holds for each $u \in V$, then
+  \begin{equation*}
+    C(T) \leq \frac{15}{8}C(T^*).
+  \end{equation*}
+\end{theorem}
+\begin{proof}
+  Let $r_1$ and $r_2$ be the endpoints of $P$, and let
+  \begin{equation*}
+    X = \{u \in V: \mu(u) \in \{r_1, r_2\}\},
+  \end{equation*}
+  where $\mu(u)$ denotes the vertex $x$ in $P$ such that $d_{T^*}(u, x)$ is minimized.
+  We have
+  \begin{align*}
+    C(T)
+    &\leq 2n \sum_{u \in V} \min_{x \in R} d_G(u, x) + \frac{n^2}{2} w(R) \\
+    &\leq 2n \sum_{u \in V} \min \{d_G(u, r_1), d_G(u, r_2)\} + \frac{n^2}{2} w(R) \\
+    &= 2n \sum_{u \in X} \min \{d_G(u, r_1), d_G(u, r_2)\} + 2n \sum_{u \in V \setminus X} \min \{d_G(u, r_1), d_G(u, r_2)\} + \frac{n^2}{2} w(R) \\
+    &\leq 2n \sum_{u \in X} \min_{x \in P} d_{T^*}(u, x) + 2n \sum_{u \in V \setminus X} \biggl(\min_{x \in P} d_{T^*}(u, x) + \frac{w(P)}{2}\biggr) + \frac{n^2}{2} w(R) \\
+    &\leq 2n \sum_{u \in V} \biggl(\min_{x \in P} d_{T^*}(u, x) + \frac{w(P)}{6}\biggr) + \frac{n^2}{2}w(P) \\
+    &= 2n \sum_{u \in V} \min_{x \in P} d_{T^*}(u, x) + \frac{5n^2}{6}w(P) \\
+    &\leq \frac{5n}{2} \sum_{u \in V} \min_{x \in P} d_{T^*}(u, x) + \frac{5n^2}{6}w(P) \\
+    &= \frac{15}{8}\Biggl(\frac{4n}{3} \sum_{u \in V} \min_{x \in P} d_{T^*}(u, x) + \frac{4n^2}{9}w(P)\Biggr) \\
+    &= \frac{15}{8}C(T^*).
     \qedhere
   \end{align*}
 \end{proof}
